@@ -20,7 +20,7 @@ namespace Coding_Tracker.nikosnick13
         Delete
     }
 
-    internal class UserMenu2123
+    internal class UserMenu
     {
 
         CodingController codingController = new();

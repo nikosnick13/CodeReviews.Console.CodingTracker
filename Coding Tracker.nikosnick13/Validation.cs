@@ -28,7 +28,7 @@ internal class Validation
     {
         if (inputUser == "0")
         {
-            UserMenu2123 userMenu = new();
+            UserMenu userMenu = new();
             userMenu.MainMenu();
         }
     }
