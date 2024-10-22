@@ -1,20 +1,10 @@
-﻿using System.Configuration;
-
-namespace Coding_Tracker.nikosnick13;
-
-internal class Program
+﻿namespace Coding_Tracker.nikosnick13
 {
-    static public string connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
-
-    //  static public string connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");  
-
-    static void Main(string[] args)
+    internal class Program
     {
-        DatabaseManager databaseManager = new DatabaseManager();
-        databaseManager.CreatTable(connectionString);
-
-     //   UserMenu menu = new UserMenu();
-      //  menu.MainMenu();
-
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello, World!");
+        }
     }
 }
