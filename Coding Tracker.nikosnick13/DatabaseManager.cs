@@ -11,7 +11,7 @@ namespace Coding_Tracker.nikosnick13
     internal class DatabaseManager
     {
 
-        public void CreatTable(string connection) 
+        public void CreatTable(string connection)
         {
             try
             {
@@ -19,8 +19,9 @@ namespace Coding_Tracker.nikosnick13
                 {
                     conn.Open();
                     string query = @"CREATE TABLE IF NOT EXISTS coding(
-                        Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        Date TEXT,
+                       Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        StartTime DATETIME,
+                        EndTime DATETIME,
                         Duration TEXT
                     )";
 

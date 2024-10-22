@@ -13,22 +13,24 @@ namespace Coding_Tracker.nikosnick13
 
     enum Menu
     {
-        Exit, 
+        Exit,
         View,
         Add,
         Edit,
         Delete
     }
 
-    internal class UserMenu
+    internal class UserMenu2123
     {
 
         CodingController codingController = new();
-        public void MainMenu() 
+
+        public void MainMenu123()
         {
             bool isAppRuning = true;
 
-            while (isAppRuning) {
+            while (isAppRuning)
+            {
 
                 var menu = AnsiConsole.Prompt(
                 new SelectionPrompt<Menu>()
@@ -40,9 +42,9 @@ namespace Coding_Tracker.nikosnick13
                     .AddChoices(Menu.Delete)
                     );
 
-                switch (menu) 
+                switch (menu)
                 {
-                    case  Menu.Exit:
+                    case Menu.Exit:
                         isAppRuning = false;
                         Environment.Exit(0);
                         break;
@@ -63,10 +65,70 @@ namespace Coding_Tracker.nikosnick13
                 }
             }
 
-            
+
         }
 
-        private void ProcessDelete() 
+        private void ProssesAdd()
+        {
+            Clear();
+
+            var  startTime = GetTimeInput("Please insert the houre to start:(Format: hh:mm).Type 0 to return to main manu.");
+
+            var endTime = GetTimeInput("Please insert the houre to start:(Format: hh:mm).Type 0 to return to main manu.");
+
+            TimeSpan startTimeInput = TimeSpan.ParseExact(startTime, "hh\\:mm", CultureInfo.InvariantCulture);
+            TimeSpan endTimeInput = TimeSpan.ParseExact(endTime, "hh\\:mm", CultureInfo.InvariantCulture);
+
+            CodingSession coding = new();
+            coding.StartTime = startTimeInput;
+            coding.EndTime = endTimeInput; 
+
+            codingController.Post(coding);
+        }
+
+        public string GetTimeInput(string msg)
+        {
+            WriteLine("\n\n ");
+            string timeInput = ReadLine();
+
+            if (timeInput == "0") MainMenu();
+
+
+            while (Validation.IsValidDuration(timeInput))
+            {
+                WriteLine("\n\nInvalid input.Please insert the date with the (Format: hh:mm) ");
+                timeInput = ReadLine();
+            }
+
+            return timeInput;
+        }
+
+       
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private void ProcessDelete()
         {
             codingController.Get();
             WriteLine("Please add id of the category you want to delete (or 0 to return to Main Menu).");
@@ -78,12 +140,12 @@ namespace Coding_Tracker.nikosnick13
                 commantInput = ReadLine();
             }
             //Parse the commantInput
-            var id =  Int32.Parse(commantInput);
+            var id = Int32.Parse(commantInput);
             if (id == 0) MainMenu();
 
             var coding = codingController.GetById(id);
-            
-            while(coding.Id == 0) 
+
+            while (coding.Id == 0)
             {
                 WriteLine($"\nRecord with id {id} doesn't exist\n");
                 ProcessDelete();
@@ -91,21 +153,21 @@ namespace Coding_Tracker.nikosnick13
             codingController.Delete(id);
 
         }
-        private void ProssesEdit() 
+        private void ProssesEdit()
         {
 
-           codingController.Get();
-           WriteLine("Please add id of the category you want to update (or 0 to return to Main Menu).");
+            codingController.Get();
+            WriteLine("Please add id of the category you want to update (or 0 to return to Main Menu).");
             string userEdit = ReadLine();
 
-            while (!Int32.TryParse(userEdit, out _) || Int32.Parse(userEdit) < 0 || string.IsNullOrEmpty(userEdit)) 
+            while (!Int32.TryParse(userEdit, out _) || Int32.Parse(userEdit) < 0 || string.IsNullOrEmpty(userEdit))
             {
                 WriteLine();
                 userEdit = ReadLine();
             }
 
             var id = Int32.Parse(userEdit);
-            
+
             if (id == 0) MainMenu();
 
             var coding = codingController.GetById(id);
@@ -118,57 +180,12 @@ namespace Coding_Tracker.nikosnick13
 
             var newDuration = GetDurationInput();
             var newDate = GetDateInput();
-            
-            coding.Date = newDate;
-            coding.Duration = newDuration;
+ 
 
             codingController.Update(coding);
         }
 
-        private void ProssesAdd() 
-        {
-            Clear();
-            var date = GetDateInput();
-            var duration = GetDurationInput();
 
-            Coding coding = new();
-            coding.Date = date;
-            coding.Duration = duration;
 
-            codingController.Post(coding);
-        }
-        public string GetDateInput() 
-        {
-            WriteLine("\n\nPlease insert the date:(Format: dd-mm-YY).Type 0 to return to main manu.");
-            string dateInput = ReadLine();
-
-            if (dateInput == "0") MainMenu();
-
-            
-            while(!DateTime.TryParseExact(dateInput, "dd-MM-yy", new CultureInfo("en-US"), DateTimeStyles.None, out _))
-            {
-                WriteLine("\n\nInvalid input.Please insert the date with the format: dd-MM-yy.");
-                dateInput = ReadLine();
-            }
-
-            return dateInput; 
-        }
-
-        public string GetDurationInput() 
-        {
-            WriteLine("\n\nPlease insert the Dutation:(Format: hh:mm).Type 0 to return to main manu.");
-            string durationInput = ReadLine();
-            
-            if(durationInput == "0") MainMenu();
-
-            
-            while (!TimeSpan.TryParseExact(durationInput, "h\\:mm", CultureInfo.InvariantCulture, out _))
-            {
-                WriteLine("\n\nInvalid input.Please insert the Dutation:(Format: hh:mm). Type 0 to return to main manu.");
-                durationInput = ReadLine();
-                if (durationInput == "0") MainMenu();
-            }
-            return durationInput;
-        }
     }
 }
