@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,11 +26,8 @@ internal class DatabaseManager
                        EndTime DATETIME,
                        Duration TEXT
                     )";
-                using (var cmdTable = new SqliteCommand(query,conn)) 
-                {
-                    cmdTable.ExecuteNonQuery();
 
-                }
+                conn.Execute(query);
             }
         }
         catch(Exception ex)

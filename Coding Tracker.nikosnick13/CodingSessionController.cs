@@ -1,8 +1,11 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Net.Quic;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Console;
@@ -13,87 +16,75 @@ internal class CodingSessionController
 {
     static public string? connectionString = ConfigurationManager.AppSettings["ConnectionString"];
 
-    public static void Update(CodingSession session)
+    public static void UpdateCodingRecord(CodingSession session)
     {
         using (var conn = new SqliteConnection(connectionString))
         {
             conn.Open();
             string query = @"UPDATE Coding SET StartTime = @startTime, EndTime = @endTime WHERE Id = @id";
 
-            using (var editCmd = new SqliteCommand(query, conn))
+            var editCmd = conn.Execute(query, new
             {
-
-                editCmd.Parameters.AddWithValue("id", session.Id);
-                editCmd.Parameters.AddWithValue("startTime",session.StartTime);
-                editCmd.Parameters.AddWithValue("endTime" , session.EndTime);
-
-                editCmd.ExecuteNonQuery();
-
-            }
-            WriteLine($"\n\nRecord with Id {session.Id} was updated. \n\n");
+                id = session.Id,
+                startTime = session.StartTime,
+                endTime = session.EndTime
+            });
         }
     }
 
-    public static CodingSession GetById(int id)
+    public static CodingSession? GetById(int id)
     {
         using (var conn = new SqliteConnection(connectionString))
         {
             conn.Open();
-            string query = @$"SELECT * FROM Coding WHERE Id = @inputId";
+            string query = "SELECT StartTime, EndTime FROM Coding WHERE Id = @id";
 
-            using (var GetIdCmd = new SqliteCommand(query, conn)) 
+            var result = conn.QueryFirstOrDefault(query, new { id });
+
+            if (result != null)
             {
-                GetIdCmd.Parameters.AddWithValue("inputId", id);
-
-                using(var reader = GetIdCmd.ExecuteReader()) 
+                return new CodingSession
                 {
-                    CodingSession coding = new();
-                    if (reader.HasRows) 
-                    {
-                        reader.Read();
-                        coding.Id = reader.GetInt32(0);
-                        coding.StartTime  = TimeSpan.Parse(reader.GetString(1));
-                        coding.EndTime =  TimeSpan.Parse(reader.GetString(2));
-                    }
-                    Console.WriteLine("\n\n");
-                    return coding;
-                }
-
+                    Id = id,
+                    StartTime = TimeSpan.Parse(result.StartTime),
+                    EndTime = TimeSpan.Parse(result.EndTime)
+                };
             }
+            return null;
         }
-
     }
 
-
-    public static void Post(CodingSession codingSession)
+    public static void InsertCodingRecord(CodingSession codingSession)
     {
-        using (var conn = new SqliteConnection(connectionString)) 
+        using (var conn = new SqliteConnection(connectionString))
         {
             conn.Open();
-            string query = @"INSERT INTO coding (StartTime, EndTime, Duration) VALUES (@startTime, @endTime, @duration)";
+            string query = @"INSERT INTO Coding (StartTime, EndTime, Duration) VALUES (@StartTime, @EndTime, @Duration)";
 
-            using (var insertCmd = new SqliteCommand(query, conn))
+            var parameters = new
             {
-                insertCmd.Parameters.AddWithValue("@startTime", codingSession.StartTime.ToString(@"hh\:mm"));
-                insertCmd.Parameters.AddWithValue("@endTime", codingSession.EndTime.ToString(@"hh\:mm"));
-                insertCmd.Parameters.AddWithValue("@duration", (codingSession.EndTime - codingSession.StartTime).ToString(@"hh\:mm"));
-                insertCmd.ExecuteNonQuery();
-            }
+                StartTime = codingSession.StartTime.ToString(@"hh\:mm"),
+                EndTime = codingSession.EndTime.ToString(@"hh\:mm"),
+                Duration = (codingSession.EndTime - codingSession.StartTime).ToString(@"hh\:mm")
+            };
+
+            conn.Execute(query, parameters);
 
         }
     }
 
-    public static void Get()
+    public static void GetAllCodingRecords()
     {
         List<CodingSession> recordsList = new List<CodingSession>();
 
-        try 
+        try
         {
             using (var conn = new SqliteConnection(connectionString))
             {
                 conn.Open();
                 string query = @"SELECT * FROM Coding";
-
+ 
+                 
                 using (var GetAllCmd = new SqliteCommand(query, conn))
                 {
                     using (var reader = GetAllCmd.ExecuteReader())
@@ -112,42 +103,38 @@ internal class CodingSessionController
 
                         }
                         else WriteLine("\n\nNo rows fount\n\n");
-
                     }
-
                 }
             }
-        } 
-        catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             WriteLine("Error: " + ex.Message);
         }
 
-        TableVisualisation.ShowTable(recordsList);
+          TableVisualisation.ShowTable(recordsList);
     }
-    public static void  Delete(int id) 
+
+    public static void DeleteCodingRecordById(int id)
     {
         try
         {
-            using (var conn = new SqliteConnection(connectionString))
+            using (var conn = new SqliteConnection(connectionString)) 
             {
                 conn.Open();
                 string query = @"DELETE FROM Coding WHERE Id = @id ";
-                using (var cmdDelete = new SqliteCommand(query, conn))
+
+                int rowsAffected = conn.Execute(query, new { id });
+
+                if (rowsAffected > 0)
                 {
-                    cmdDelete.Parameters.AddWithValue("id", id);
-
-                    int rowsAffected = cmdDelete.ExecuteNonQuery();
-
-                    //Chek if rows affected
-                    if (rowsAffected > 0)
-                    {
-                        WriteLine($"\n\nRecord with Id {id} was deleted successfully.\n\n");
-                    }
-                    else
-                    {
-                        WriteLine($"\n\nNo record found with Id {id}. Nothing was deleted.\n\n");
-                    }
+                    WriteLine($"\n\nRecord with Id {id} was deleted successfully.Preess any key to return.\n\n");
+                    ReadKey();
+                }
+                else 
+                {
+                    WriteLine($"\n\nNo record found with Id {id}. Nothing was deleted preess any key to return..\n\n");
+                    ReadKey();
                 }
             }
         }

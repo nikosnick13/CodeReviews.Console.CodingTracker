@@ -1,18 +1,18 @@
 ﻿using Spectre.Console;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Console;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Coding_Tracker.nikosnick13;
 
 internal class UserMenu
 {
-
-
     enum Menu
     {
         Exit,
@@ -26,14 +26,14 @@ internal class UserMenu
 
     public void MainMenu()
     {
-        bool isAppRuning = true;
+        bool isAppRunning = true;
 
-        while (isAppRuning)
+        while (isAppRunning)
         {
 
             var menu = AnsiConsole.Prompt(
             new SelectionPrompt<Menu>()
-                .Title("\n\nWhat you like to do?")
+                .Title("\n\nWhat would you like to do?")
                 .AddChoices(Menu.Exit)
                 .AddChoices(Menu.View)
                 .AddChoices(Menu.Add)
@@ -44,17 +44,17 @@ internal class UserMenu
             switch (menu)
             {
                 case Menu.Exit:
-                    isAppRuning = false;
+                    isAppRunning = false;
                     Environment.Exit(0);
                     break;
                 case Menu.View:
-                    CodingSessionController.Get();
+                    CodingSessionController.GetAllCodingRecords();
                     break;
                 case Menu.Add:
-                    AddProsses();
+                    AddProcess();
                     break;
                 case Menu.Edit:
-                    ProssesEdit();
+                    ProcessEdit();
                     break;
                 case Menu.Delete:
                     DeleteProsses();
@@ -66,18 +66,18 @@ internal class UserMenu
 
     }
 
-    private void DeleteProsses() 
+    private void DeleteProsses()
     {
-        CodingSessionController.Get();
-        WriteLine("Please add id of the category you want to delete (or 0 to return to Main Menu).");
+        CodingSessionController.GetAllCodingRecords();
+        WriteLine("Please enter the ID of the category you want to delete (or 0 to return to the main menu).");
 
         string? userDelete = ReadLine();
 
         if (userDelete == "0") MainMenu();
 
-        while(Validation.IsValidId(userDelete)) 
+        while (Validation.IsValidId(userDelete))
         {
-            WriteLine("\n\nInvalid input.Please enter a valid id number.");
+            WriteLine("\n\nInvalid input.Please enter a valid ID number.");
             if (userDelete == "0") MainMenu();
             userDelete = ReadLine();
         }
@@ -86,13 +86,13 @@ internal class UserMenu
         int id = Int32.Parse(userDelete);
         var coding = CodingSessionController.GetById(id);
 
-    
-        CodingSessionController.Delete(id);
+
+        CodingSessionController.DeleteCodingRecordById(id);
         DeleteProsses();
     }
 
 
-    private void AddProsses() 
+    private void AddProcess()
     {
         var GetStartTime = GetTimeInput("\nPlease insert the houre to start:(Format: hh:mm).Type 0 to return to main manu.");
         var GetEndTime = GetTimeInput("\nPlease insert the houre to end:(Format: hh:mm).Type 0 to return to main manu.");
@@ -106,13 +106,10 @@ internal class UserMenu
         codingSession.StartTime = startTimeInput;
         codingSession.EndTime = endTimeInput;
 
-        CodingSessionController.Post(codingSession);
- 
-
+        CodingSessionController.InsertCodingRecord(codingSession);
     }
 
-
-    private string GetTimeInput(string? msg) 
+    private string GetTimeInput(string? msg)
     {
         WriteLine(msg);
 
@@ -129,39 +126,40 @@ internal class UserMenu
         return timeInput!;
     }
 
-    private void ProssesEdit() 
+    private void ProcessEdit()
     {
-        CodingSessionController.Get();
+        CodingSessionController.GetAllCodingRecords();
         WriteLine("Please add id of the category you want to update (or 0 to return to Main Menu).");
 
         string? userEdit = ReadLine();
 
-         while (Validation.IsValidId(userEdit))
-         {
-                WriteLine("\n\nInvalid input. Please enter a valid id number.");
-                userEdit = ReadLine();
-         }
+        while (Validation.IsValidId(userEdit))
+        {
+            WriteLine("\n\nInvalid input. Please enter a valid id number.");
+            userEdit = ReadLine();
+        }
 
-            var id = Int32.Parse(userEdit);
+        var id = Int32.Parse(userEdit);
 
-            if (id == 0) MainMenu();
+        if (id == 0) MainMenu();
 
-            var coding = CodingSessionController.GetById(id);
+        var coding = CodingSessionController.GetById(id);
 
-            while (coding.Id == 0)
-            {
-                WriteLine($"\nRecord with id {id} doesn't exist\n");
-                ProssesEdit();
-            }
+        if (coding == null)
+        {
+            WriteLine($"Record with id {id} doesn't exist. Press any key to return to editing.");
+            ReadLine();
+            ProcessEdit();
+            return;
+        }
+        var newStartTimeInput = GetTimeInput("\nPlease insert the new houre to start:(Format: hh:mm).Type 0 to return to main manu.");
 
-        var  newStartTimeInput = GetTimeInput("\nPlease insert the houre to start:(Format: hh:mm).Type 0 to return to main manu.");
-
-        var newEndtTimeInput = GetTimeInput("\nPlease insert the houre to end:(Format: hh:mm).Type 0 to return to main manu.");
+        var newEndtTimeInput = GetTimeInput("\nPlease insert the new houre to end:(Format: hh:mm).Type 0 to return to main manu.");
 
         coding.StartTime = TimeSpan.Parse(newStartTimeInput);
         coding.EndTime = TimeSpan.Parse(newEndtTimeInput);
 
-        CodingSessionController.Update(coding);
+        CodingSessionController.UpdateCodingRecord(coding);
 
     }
 
@@ -169,6 +167,6 @@ internal class UserMenu
 
 
 }
- 
 
-    
+
+
