@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Spectre.Console;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,6 +11,19 @@ namespace Coding_Tracker.nikosnick13;
 
 internal class Validation
 {
+    public static bool ConfirmDeletion(int id)
+    {
+
+        var confirmation = AnsiConsole.Prompt(
+            new TextPrompt<bool>($"Do you want to delete it the ID:{id}?")
+                .AddChoice(true)
+                .AddChoice(false)
+                .DefaultValue(true)
+                .WithConverter(choice => choice ? "y" : "n"));
+
+
+        return confirmation;
+    }
 
     public static bool IsStringIsNull(string? str)
     {

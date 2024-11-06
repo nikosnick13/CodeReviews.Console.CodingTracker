@@ -86,8 +86,10 @@ internal class UserMenu
         int id = Int32.Parse(userDelete);
         var coding = CodingSessionController.GetById(id);
 
+        bool shouldDelete = Validation.ConfirmDeletion(id);
 
-        CodingSessionController.DeleteCodingRecordById(id);
+        if (shouldDelete) CodingSessionController.DeleteCodingRecordById(id);
+
         DeleteProsses();
     }
 
