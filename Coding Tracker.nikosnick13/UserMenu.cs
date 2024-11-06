@@ -154,12 +154,22 @@ internal class UserMenu
             ProcessEdit();
             return;
         }
-        var newStartTimeInput = GetTimeInput("\nPlease insert the new houre to start:(Format: hh:mm).Type 0 to return to main manu.");
 
-        var newEndtTimeInput = GetTimeInput("\nPlease insert the new houre to end:(Format: hh:mm).Type 0 to return to main manu.");
+        bool shouldEdit = Validation.ConfirmEdit("Do you want edit the start houre? ");
 
-        coding.StartTime = TimeSpan.Parse(newStartTimeInput);
-        coding.EndTime = TimeSpan.Parse(newEndtTimeInput);
+        if (shouldEdit) 
+        {
+            var newStartTimeInput = GetTimeInput("\nPlease insert the new houre to start:(Format: hh:mm).Type 0 to return to main manu.");
+            coding.StartTime = TimeSpan.Parse(newStartTimeInput);
+        }
+
+        shouldEdit = Validation.ConfirmEdit("Do you want edit the end houre?");
+
+        if (shouldEdit)
+        {
+            var newEndtTimeInput = GetTimeInput("\nPlease insert the new houre to end:(Format: hh:mm).Type 0 to return to main manu.");
+            coding.EndTime = TimeSpan.Parse(newEndtTimeInput);
+        }
 
         CodingSessionController.UpdateCodingRecord(coding);
 

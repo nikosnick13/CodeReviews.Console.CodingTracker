@@ -11,6 +11,20 @@ namespace Coding_Tracker.nikosnick13;
 
 internal class Validation
 {
+    public static bool ConfirmEdit(string msg)
+    {
+
+        var confirmation = AnsiConsole.Prompt(
+            new TextPrompt<bool>(msg)
+                .AddChoice(true)
+                .AddChoice(false)
+                .DefaultValue(true)
+                .WithConverter(choice => choice ? "y" : "n"));
+
+
+        return confirmation;
+    }
+
     public static bool ConfirmDeletion(int id)
     {
 
