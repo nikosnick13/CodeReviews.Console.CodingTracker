@@ -59,6 +59,7 @@ internal class CodingSessionController
         using (var conn = new SqliteConnection(connectionString))
         {
             conn.Open();
+
             string query = @"INSERT INTO Coding (StartTime, EndTime, Duration) VALUES (@StartTime, @EndTime, @Duration)";
 
             var parameters = new
