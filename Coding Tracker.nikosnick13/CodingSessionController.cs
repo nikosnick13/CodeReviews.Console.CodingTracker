@@ -4,10 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Net.Quic;
-using System.Runtime.InteropServices.Marshalling;
-using System.Text;
-using System.Threading.Tasks;
 using static System.Console;
 
 namespace Coding_Tracker.nikosnick13;
@@ -70,7 +66,6 @@ internal class CodingSessionController
             };
 
             conn.Execute(query, parameters);
-
         }
     }
 
@@ -84,7 +79,6 @@ internal class CodingSessionController
             {
                 conn.Open();
                 string query = @"SELECT * FROM Coding";
- 
                  
                 using (var GetAllCmd = new SqliteCommand(query, conn))
                 {

@@ -1,11 +1,8 @@
 ﻿using Spectre.Console;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static System.Console;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -84,7 +81,6 @@ internal class UserMenu
 
         //Parse the commantInput
         int id = Int32.Parse(userDelete);
-        var coding = CodingSessionController.GetById(id);
 
         bool shouldDelete = Validation.ConfirmDeletion(id);
 

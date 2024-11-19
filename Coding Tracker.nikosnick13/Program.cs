@@ -1,5 +1,4 @@
 ﻿using System.Configuration;
-using System.Threading.Tasks;
 using static System.Console;
 
 namespace Coding_Tracker.nikosnick13;
