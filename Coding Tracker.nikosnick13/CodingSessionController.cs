@@ -2,7 +2,6 @@
 using Microsoft.Data.Sqlite;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using static System.Console;
 
@@ -19,7 +18,7 @@ internal class CodingSessionController
             conn.Open();
             string query = @"UPDATE Coding SET StartTime = @startTime, EndTime = @endTime WHERE Id = @id";
 
-            var editCmd = conn.Execute(query, new
+            conn.Execute(query, new
             {
                 id = session.Id,
                 startTime = session.StartTime,
